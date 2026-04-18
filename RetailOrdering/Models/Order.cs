@@ -22,6 +22,7 @@ public class Order
     public string? CouponCode { get; set; }
 
     public decimal DiscountAmount { get; set; } = 0;
+    public DateTime? UpdatedAt { get; set; }  
 
     // Navigation
     public ICollection<OrderItem>? Items { get; set; }
