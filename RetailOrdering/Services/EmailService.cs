@@ -26,8 +26,8 @@ public class EmailService : IEmailService
         var itemsHtml = string.Join("", order.Items.Select(i =>
             $"<tr><td style='padding:8px;border-bottom:1px solid #eee'>{i.Product?.Name ?? $"Product #{i.ProductId}"}</td>" +
             $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:center'>{i.Quantity}</td>" +
-            $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:right'>₹{i.UnitPrice:F2}</td>" +
-            $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:right'>₹{i.UnitPrice * i.Quantity:F2}</td></tr>"
+            $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:right'>₹{i.Price:F2}</td>" +
+            $"<td style='padding:8px;border-bottom:1px solid #eee;text-align:right'>₹{i.Price * i.Quantity:F2}</td></tr>"
         ));
 
         var body = $"""
@@ -40,7 +40,7 @@ public class EmailService : IEmailService
                 <p>Thank you for your order. Here's your summary:</p>
                 <p><strong>Order ID:</strong> #{order.Id}</p>
                 <p><strong>Status:</strong> {order.Status}</p>
-                <p><strong>Delivery Address:</strong> {order.DeliveryAddress}</p>
+                <p><strong>Delivery Address:</strong> {order.Address}</p>
                 
                 <table width='100%' style='border-collapse:collapse;margin:20px 0'>
                   <thead>

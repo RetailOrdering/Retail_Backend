@@ -67,7 +67,6 @@ public class ProductService : IProductService
         Stock = p.Stock,
         CategoryId = p.CategoryId,
         CategoryName = p.Category?.Name,
-        ImageUrl = p.ImageUrl,
         Packaging = p.Packaging
     };
 
@@ -79,7 +78,6 @@ public class ProductService : IProductService
         Brand = dto.Brand,
         Stock = dto.Stock,
         CategoryId = dto.CategoryId,
-        ImageUrl = dto.ImageUrl,
         Packaging = dto.Packaging
     };
 }

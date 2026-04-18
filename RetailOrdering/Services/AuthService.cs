@@ -30,12 +30,12 @@ public class AuthService : IAuthService
         if (await _db.Users.AnyAsync(u => u.Email == email))
             throw new InvalidOperationException("A user with this email already exists.");
 
-        if (await _db.Users.AnyAsync(u => u.Username == username))
+        if (await _db.Users.AnyAsync(u => u.Name == username))
             throw new InvalidOperationException("This username is already taken.");
 
         var user = new User
         {
-            Username = username,
+            Name = username,
             Email = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
             Role = role,
@@ -48,7 +48,7 @@ public class AuthService : IAuthService
         return new AuthResponseDto
         {
             Token = _jwt.GenerateToken(user),
-            Username = user.Username,
+            Name = user.Name,
             Email = user.Email,
             Role = user.Role
         };
@@ -65,7 +65,7 @@ public class AuthService : IAuthService
         return new AuthResponseDto
         {
             Token = _jwt.GenerateToken(user),
-            Username = user.Username,
+                Name = user.Name,
             Email = user.Email,
             Role = user.Role
         };

@@ -46,12 +46,11 @@ public class CouponRepository : ICouponRepository
         var coupon = await _db.Coupons.FindAsync(id);
         if (coupon == null) return null;
 
-        coupon.DiscountPercent = updated.DiscountPercent;
-        coupon.MinOrderAmount = updated.MinOrderAmount;
-        coupon.MaxUsageCount = updated.MaxUsageCount;
+        coupon.DiscountPercentage = updated.DiscountPercentage;
+        coupon.MinimumOrderAmount = updated.MinimumOrderAmount;
         coupon.ExpiryDate = updated.ExpiryDate;
         coupon.IsActive = updated.IsActive;
-        coupon.UpdatedAt = DateTime.UtcNow;
+        coupon.LastUpdated = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
         return coupon;
@@ -72,7 +71,7 @@ public class CouponRepository : ICouponRepository
         var coupon = await _db.Coupons.FindAsync(couponId);
         if (coupon == null) return false;
 
-        coupon.UsedCount++;
+        
         await _db.SaveChangesAsync();
         return true;
     }

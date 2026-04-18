@@ -52,7 +52,7 @@ public class CartService : ICartService
                 CartId = cart.Id,
                 ProductId = productId,
                 Quantity = quantity,
-                UnitPrice = product.Price
+                Price = product.Price
             };
             await _cartRepo.AddItemAsync(newItem);
         }

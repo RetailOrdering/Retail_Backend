@@ -28,7 +28,7 @@ public class ProductRepository : IProductRepository
     {
         var query = _db.Products
             .Include(p => p.Category)
-            .Where(p => p.IsActive)
+            .Where(p => p.IsAvailable)
             .AsQueryable();
 
         if (categoryId.HasValue)
@@ -41,7 +41,7 @@ public class ProductRepository : IProductRepository
     }
 
     public async Task<Product?> GetByIdAsync(int id)
-        => await _db.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
+        => await _db.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id && p.IsAvailable);
 
     public async Task<Product> CreateAsync(Product product)
     {
@@ -62,7 +62,6 @@ public class ProductRepository : IProductRepository
         product.Brand = updated.Brand;
         product.Stock = updated.Stock;
         product.CategoryId = updated.CategoryId;
-        product.ImageUrl = updated.ImageUrl;
         product.Packaging = updated.Packaging;
         product.UpdatedAt = DateTime.UtcNow;
 
@@ -75,7 +74,7 @@ public class ProductRepository : IProductRepository
         var product = await _db.Products.FindAsync(id);
         if (product == null) return false;
 
-        product.IsActive = false; // Soft delete
+        product.IsAvailable = false; // Soft delete
         product.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
         return true;

@@ -9,7 +9,7 @@ public interface IOrderService
     Task<IEnumerable<OrderDto>> GetAllOrdersAsync();
     Task<IEnumerable<OrderDto>> GetUserOrdersAsync(int userId);
     Task<OrderDto> GetOrderByIdAsync(int id, int userId, bool isAdmin = false);
-    Task<OrderDto> PlaceOrderAsync(int userId, string deliveryAddress, int? couponId = null);
+    Task<OrderDto> PlaceOrderAsync(int userId, string deliveryAddress, string? couponcode = null);
     Task<OrderDto> UpdateOrderStatusAsync(int id, string status);
     Task<List<int>> GetReorderProductIdsAsync(int userId, int orderId);
 }
@@ -57,7 +57,7 @@ public class OrderService : IOrderService
         return MapToDto(order);
     }
 
-    public async Task<OrderDto> PlaceOrderAsync(int userId, string deliveryAddress, int? couponId = null)
+    public async Task<OrderDto> PlaceOrderAsync(int userId, string deliveryAddress, string? couponcode = null)
     {
         var cart = await _cartRepo.GetCartByUserIdAsync(userId)
             ?? throw new InvalidOperationException("Cart not found.");
@@ -83,10 +83,10 @@ public class OrderService : IOrderService
         {
             ProductId = i.ProductId,
             Quantity = i.Quantity,
-            UnitPrice = i.UnitPrice
+            Price = i.Price
         }).ToList();
 
-        decimal totalAmount = orderItems.Sum(i => i.UnitPrice * i.Quantity);
+        decimal totalAmount = orderItems.Sum(i => i.Price * i.Quantity);
 
         // Coupon discount is applied by CouponService before calling this; 
         // pass discounted amount if provided, otherwise use full total
@@ -95,8 +95,8 @@ public class OrderService : IOrderService
             UserId = userId,
             Items = orderItems,
             TotalAmount = totalAmount,
-            DeliveryAddress = deliveryAddress,
-            CouponId = couponId
+            Address = deliveryAddress,
+            CouponCode = couponcode
         };
 
         var created = await _orderRepo.CreateAsync(order);
@@ -144,15 +144,14 @@ public class OrderService : IOrderService
         UserId = o.UserId,
         Status = o.Status,
         TotalAmount = o.TotalAmount,
-        DeliveryAddress = o.DeliveryAddress,
+        Address = o.Address,
         CreatedAt = o.CreatedAt,
         Items = o.Items.Select(i => new OrderItemDto
         {
             ProductId = i.ProductId,
             ProductName = i.Product?.Name ?? string.Empty,
             Quantity = i.Quantity,
-            UnitPrice = i.UnitPrice,
-            Subtotal = i.UnitPrice * i.Quantity
+            Price = i.Price,
         }).ToList()
     };
 }

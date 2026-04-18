@@ -15,4 +15,5 @@ public class OrderItem
     public int Quantity { get; set; }
 
     public decimal Price { get; set; } // price at order time
+    
 }

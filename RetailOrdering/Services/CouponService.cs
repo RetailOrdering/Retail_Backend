@@ -68,13 +68,13 @@ public class CouponService : ICouponService
         if (coupon.ExpiryDate < DateTime.UtcNow)
             return (false, "This coupon has expired.", 0);
 
-        if (coupon.MaxUsageCount > 0 && coupon.UsedCount >= coupon.MaxUsageCount)
-            return (false, "This coupon has reached its maximum usage limit.", 0);
+        //if (coupon.MaxUsageCount > 0 && coupon.UsedCount >= coupon.MaxUsageCount)
+        //    return (false, "This coupon has reached its maximum usage limit.", 0);
 
-        if (coupon.MinOrderAmount > 0 && orderTotal < coupon.MinOrderAmount)
-            return (false, $"Minimum order amount of ₹{coupon.MinOrderAmount:F2} required for this coupon.", 0);
+        if (coupon.MinimumOrderAmount > 0 && orderTotal < coupon.MinimumOrderAmount)
+            return (false, $"Minimum order amount of ₹{coupon.MinimumOrderAmount:F2} required for this coupon.", 0);
 
-        var discount = Math.Round(orderTotal * (coupon.DiscountPercent / 100m), 2);
+        var discount = Math.Round(orderTotal * (coupon.DiscountPercentage / 100m), 2);
         await _repo.IncrementUsageAsync(coupon.Id);
 
         return (true, $"Coupon applied! You saved ₹{discount:F2}.", discount);
@@ -84,10 +84,8 @@ public class CouponService : ICouponService
     {
         Id = c.Id,
         Code = c.Code,
-        DiscountPercent = c.DiscountPercent,
-        MinOrderAmount = c.MinOrderAmount,
-        MaxUsageCount = c.MaxUsageCount,
-        UsedCount = c.UsedCount,
+        DiscountPercentage = c.DiscountPercentage,
+        MinimumOrderAmount = c.MinimumOrderAmount,
         ExpiryDate = c.ExpiryDate,
         IsActive = c.IsActive
     };
@@ -95,9 +93,8 @@ public class CouponService : ICouponService
     private static Coupon MapToEntity(CouponDto dto) => new()
     {
         Code = dto.Code.ToUpper(),
-        DiscountPercent = dto.DiscountPercent,
-        MinOrderAmount = dto.MinOrderAmount,
-        MaxUsageCount = dto.MaxUsageCount,
+        DiscountPercentage = dto.DiscountPercentage,
+        MinimumOrderAmount = dto.MinimumOrderAmount,
         ExpiryDate = dto.ExpiryDate,
         IsActive = dto.IsActive
     };

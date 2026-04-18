@@ -15,4 +15,5 @@ public class CartItem
     public int Quantity { get; set; }
 
     public decimal Price { get; set; } // snapshot price
+    public DateTime AddedAt { get; set; } = DateTime.UtcNow;
 }
