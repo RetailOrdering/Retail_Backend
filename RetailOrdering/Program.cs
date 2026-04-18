@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // 🔐 JWT Authentication
 // ======================
 var jwtSettings = configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? configuration["Jwt:Key"];
+var secretKey = jwtSettings["SecretKey"];
 
 if (string.IsNullOrEmpty(secretKey))
 {
@@ -44,7 +44,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = true; // set false only for local dev if needed
+    options.RequireHttpsMetadata = false; // ✅ Allow local development
     options.SaveToken = true;
 
     options.TokenValidationParameters = new TokenValidationParameters
@@ -61,6 +61,16 @@ builder.Services.AddAuthentication(options =>
 
         ClockSkew = TimeSpan.Zero
     };
+});
+
+// ======================
+// 🔐 Authorization Policies
+// ======================
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
+    options.AddPolicy("AdminOrCustomer", policy => policy.RequireRole("Admin", "Customer"));
 });
 
 // ======================
@@ -102,8 +112,36 @@ builder.Services.AddCors(options =>
 // 📦 Controllers & Swagger
 // ======================
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // ✅ Add JWT support in Swagger
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter: Bearer {your JWT token}"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 // ======================
 // 🚀 Build App
@@ -114,17 +152,22 @@ var app = builder.Build();
 // 🔁 Middleware Pipeline
 // ======================
 
-app.UseExceptionMiddleware();     // Custom global exception handler
+// ✅ Order matters here
+app.UseExceptionMiddleware();      // Global error handler
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
+// 🔐 Auth must come before Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Swagger only in Development
+// ======================
+// 📘 Swagger
+// ======================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
