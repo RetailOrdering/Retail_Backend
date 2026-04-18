@@ -52,7 +52,6 @@ public class CartController : ControllerBase
                 Id = i.Id,
                 ProductId = i.ProductId,
                 ProductName = i.Product?.Name ?? string.Empty,
-                ProductImageUrl = i.Product?.ImageUrl ?? string.Empty,
                 Quantity = i.Quantity,
                 Price = i.Price
             }).ToList() ?? new List<CartItemDto>(),

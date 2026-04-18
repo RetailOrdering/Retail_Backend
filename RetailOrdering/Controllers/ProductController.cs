@@ -38,7 +38,6 @@ public class ProductController : ControllerBase
                 Name = p.Name,
                 Description = p.Description,
                 Price = p.Price,
-                ImageUrl = p.ImageUrl,
                 CategoryId = p.CategoryId,
                 CategoryName = p.Category != null ? p.Category.Name : string.Empty,
                 Stock = p.Stock,
@@ -65,7 +64,6 @@ public class ProductController : ControllerBase
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,
-            ImageUrl = product.ImageUrl,
             CategoryId = product.CategoryId,
             CategoryName = product.Category?.Name ?? string.Empty,
             Stock = product.Stock,
@@ -82,7 +80,6 @@ public class ProductController : ControllerBase
             Name = dto.Name,
             Description = dto.Description,
             Price = dto.Price,
-            ImageUrl = dto.ImageUrl,
             CategoryId = dto.CategoryId,
             Stock = dto.Stock,
             IsAvailable = true,
@@ -106,7 +103,6 @@ public class ProductController : ControllerBase
         product.Name = dto.Name;
         product.Description = dto.Description;
         product.Price = dto.Price;
-        product.ImageUrl = dto.ImageUrl;
         product.CategoryId = dto.CategoryId;
         product.Stock = dto.Stock;
         product.IsAvailable = dto.IsAvailable;
