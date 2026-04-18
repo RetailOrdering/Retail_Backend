@@ -21,4 +21,6 @@ public class Product
     public bool IsAvailable { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public ICollection<OrderItem>? OrderItems { get; set; }
+    public ICollection<CartItem>?CartItems { get; set; }
 }
