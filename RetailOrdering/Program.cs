@@ -6,6 +6,7 @@ using RetailOrdering.Helpers;
 using RetailOrdering.Middleware;
 using RetailOrdering.Repositories;
 using RetailOrdering.Services;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +59,8 @@ builder.Services.AddAuthentication(options =>
 
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
+
+        RoleClaimType = ClaimTypes.Role,
 
         ClockSkew = TimeSpan.Zero
     };

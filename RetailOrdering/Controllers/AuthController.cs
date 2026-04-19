@@ -39,7 +39,7 @@ namespace RetailOrdering.Controllers;
                 Name = request.Name,
                 Email = request.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = "Customer",
+                Role = "Admin",
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -59,6 +59,8 @@ namespace RetailOrdering.Controllers;
             {
                 UserId = user.Id,
                 Points = 0,
+                Description = "Account Created",
+                Type = "Credit", // ✅ FIX
                 LastUpdated = DateTime.UtcNow
             };
             _context.LoyaltyPoints.Add(loyaltyPoints);
@@ -100,23 +102,35 @@ namespace RetailOrdering.Controllers;
             });
         }
 
-        private string GenerateJwtToken(User user)
+    private string GenerateJwtToken(User user)
+    {
+        var jwtSettings = _configuration.GetSection("JwtSettings");
+
+        var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"] ?? "your-secret-key-here-minimum-32-characters-long");
-            var tokenDescriptor = new SecurityTokenDescriptor
+            Subject = new ClaimsIdentity(new[]
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role)
+        }),
+
+            Expires = DateTime.UtcNow.AddHours(Convert.ToDouble(jwtSettings["ExpiryHours"])),
+
+            Issuer = jwtSettings["Issuer"],      // ✅ REQUIRED
+            Audience = jwtSettings["Audience"],  // ✅ REQUIRED
+
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
     }
+}
 

@@ -37,14 +37,19 @@ public class CategoryController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCategory(int id)
     {
-        var category = await _context.Categories
-            .Include(c => c.Products)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        try
+        {
+            var category = await _context.Categories.FindAsync(id);
 
-        if (category == null)
-            return NotFound();
+            if (category == null)
+                return NotFound("Category not found");
 
-        return Ok(category);
+            return Ok(category);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 
     [Authorize(Roles = "Admin")]
